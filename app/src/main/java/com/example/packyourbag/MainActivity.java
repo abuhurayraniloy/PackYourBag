@@ -3,12 +3,17 @@ package com.example.packyourbag;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.preference.PreferenceManager;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+//import android.preference.PreferenceManager;
 import android.widget.Toast;
 
 import com.example.packyourbag.Adapter.Adapter;
 import com.example.packyourbag.Constants.MyConstants;
+import com.example.packyourbag.Data.AppData;
+import com.example.packyourbag.Database.RoomDB;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
     List<String> titles;
     List<Integer> images;
     Adapter adapter;
+    RoomDB database;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +56,15 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "Tap back button in order to exit", Toast.LENGTH_SHORT).show();
         }
         mBackPressed = System.currentTimeMillis();
+    }
+
+    private void persistAppData(){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = prefs.edit();
+
+        database = RoomDB.getInstance(this);
+        AppData appData = new AppData(database);
+        int last = prefs.getInt(AppData.LAST_VERSION, 0);
     }
 
     private void addAllTitles(){
