@@ -34,6 +34,9 @@ public class MainActivity extends AppCompatActivity {
 
         addAllTitles();
         addAllImages();
+        persistAppData();
+        database = RoomDB.getInstance(this);
+        System.out.println("-----------> "+database.mainDao().getAllSelected(false).get(0).getItemname());
 
         adapter = new Adapter(this, titles, images, MainActivity.this);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this,2,GridLayoutManager.VERTICAL,false);
@@ -65,6 +68,18 @@ public class MainActivity extends AppCompatActivity {
         database = RoomDB.getInstance(this);
         AppData appData = new AppData(database);
         int last = prefs.getInt(AppData.LAST_VERSION, 0);
+        if(!prefs.getBoolean(MyConstants.FIRST_TIME_CAMEL_CASE, false)){
+            appData.persistAllData();
+            editor.putBoolean(MyConstants.FIRST_TIME_CAMEL_CASE, true);
+            editor.commit();
+
+        }
+        else if(last<AppData.NEW_VERSION){
+            database.mainDao().deleteAllSystemItems(MyConstants.SYSTEM_SMALL);
+            appData.persistAllData();
+            editor.putInt(AppData.LAST_VERSION, AppData.NEW_VERSION);
+            editor.commit();
+        }
     }
 
     private void addAllTitles(){
